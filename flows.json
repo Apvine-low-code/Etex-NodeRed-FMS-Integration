@@ -105,7 +105,8 @@
             "a2efd4a00ee38fb5",
             "a42f67315426e688",
             "4ad5f1d34f19f9f3",
-            "f6156060b121eca2"
+            "f6156060b121eca2",
+            "c0e9094cb50d99a7"
         ],
         "x": 94,
         "y": 499,
@@ -214,7 +215,7 @@
         "type": "function",
         "z": "b9112020394e29d0",
         "name": "MapMessages",
-        "func": "// File contains multiple lines like this:\n// M4  ,25/09/2024,03:13:18,25/09/2024,03:16:19,***\n// fields are: machine code, start date, start time, end date, end time, reason code\nconst formatDate = global.get(\"formatDate\"); // see 'on-start' tab\nconst lines = msg.payload.split(/\\r?\\n/);\n\nmsg.messages = [];\n\nlines.forEach((line)=>{\n    const fields = line.split(\",\");\n    let startTime = formatDate(fields[1] + fields[2]);\n    let endTime = formatDate(fields[3] + fields[4]);\n\n    msg.messages.push({\n        \"messageType\": \"create_update_downtime\",\n        \"parameters\": [\n            {\n                \"attribute\": \"workcenterid\",\n                \"value\": fields[0].trim()\n            },\n            {\n                \"attribute\": \"startTime\",\n                \"value\": startTime\n            },\n            {\n                \"attribute\": \"endTime\",\n                \"value\": endTime\n            }\n        ]\n    });\n})\n\nreturn msg;",
+        "func": "// File contains multiple lines like this:\n// M4  ,25/09/2024,03:13:18,25/09/2024,03:16:19,***\n// fields are: machine code, start date, start time, end date, end time, reason code\nconst formatDate = global.get(\"formatDate\"); // see 'on-start' tab\nconst lines = msg.payload.split(/\\r?\\n/);\n\nmsg.messages = [];\n\nlines.forEach((line)=>{\n    if(! line) return;\n    \n    const fields = line.split(\",\");\n    let startTime = formatDate(fields[1] + fields[2]);\n    let endTime = formatDate(fields[3] + fields[4]);\n\n    msg.messages.push({\n        \"messageType\": \"create_update_downtime\",\n        \"parameters\": [\n            {\n                \"attribute\": \"workcenterid\",\n                \"value\": fields[0].trim()\n            },\n            {\n                \"attribute\": \"startTime\",\n                \"value\": startTime\n            },\n            {\n                \"attribute\": \"endTime\",\n                \"value\": endTime\n            }\n        ]\n    });\n})\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -595,157 +596,6 @@
         ]
     },
     {
-        "id": "95ed601e9b7582a4",
-        "type": "watch",
-        "z": "663405f12566bce6",
-        "g": "de0617ba6b2d0a63",
-        "name": "Watch folder changes",
-        "files": "${FolderToWatch}",
-        "recursive": "",
-        "x": 220,
-        "y": 440,
-        "wires": [
-            [
-                "4447b76fbc16edc7"
-            ]
-        ]
-    },
-    {
-        "id": "4447b76fbc16edc7",
-        "type": "switch",
-        "z": "663405f12566bce6",
-        "g": "de0617ba6b2d0a63",
-        "name": "is update?",
-        "property": "event",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "update",
-                "vt": "str"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 450,
-        "y": 440,
-        "wires": [
-            [
-                "61367d0d269217f8"
-            ]
-        ]
-    },
-    {
-        "id": "61367d0d269217f8",
-        "type": "switch",
-        "z": "663405f12566bce6",
-        "g": "de0617ba6b2d0a63",
-        "name": "is file?",
-        "property": "type",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "file",
-                "vt": "str"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 630,
-        "y": 440,
-        "wires": [
-            [
-                "31b930d30898aa25"
-            ]
-        ]
-    },
-    {
-        "id": "727a7b74b2a235b6",
-        "type": "inject",
-        "z": "663405f12566bce6",
-        "g": "87236d5bcabd69a0",
-        "name": "On start",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "1",
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 200,
-        "y": 180,
-        "wires": [
-            [
-                "ec6410c418d8cbdc"
-            ]
-        ]
-    },
-    {
-        "id": "ec6410c418d8cbdc",
-        "type": "function",
-        "z": "663405f12566bce6",
-        "g": "87236d5bcabd69a0",
-        "name": "Read files in folder",
-        "func": "msg.files = fs.readdirSync(env.get(\"FolderToWatch\"));\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [
-            {
-                "var": "fs",
-                "module": "fs"
-            }
-        ],
-        "x": 410,
-        "y": 180,
-        "wires": [
-            [
-                "3347a719b4a044bc"
-            ]
-        ]
-    },
-    {
-        "id": "3347a719b4a044bc",
-        "type": "loop",
-        "z": "663405f12566bce6",
-        "g": "87236d5bcabd69a0",
-        "name": "For each file",
-        "kind": "enum",
-        "count": "",
-        "initial": "1",
-        "step": "1",
-        "condition": "",
-        "conditionType": "js",
-        "when": "before",
-        "enumeration": "files",
-        "enumerationType": "msg",
-        "limit": "",
-        "loopPayload": "loop-val",
-        "finalPayload": "final-orig",
-        "x": 650,
-        "y": 180,
-        "wires": [
-            [],
-            [
-                "3faec9f706e79632"
-            ]
-        ]
-    },
-    {
         "id": "831d3ffb7aab030b",
         "type": "link in",
         "z": "663405f12566bce6",
@@ -785,8 +635,8 @@
         "type": "function",
         "z": "663405f12566bce6",
         "g": "e2df9081b54634df",
-        "name": "rename .txt to .tmp",
-        "func": "msg.newFileName = msg.filename.replaceAll('.txt', '.tmp');\n\nfs.renameSync(msg.filename, msg.newFileName);\n\nreturn msg;",
+        "name": "rename .dat to .tmp",
+        "func": "msg.newFileName = msg.filename.replaceAll('.dat', '.tmp');\n\nfs.renameSync(msg.filename, msg.newFileName);\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -819,16 +669,22 @@
                 "t": "cont",
                 "v": ".dat",
                 "vt": "str"
+            },
+            {
+                "t": "else"
             }
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 1,
+        "outputs": 2,
         "x": 250,
         "y": 600,
         "wires": [
             [
                 "4ad5f1d34f19f9f3"
+            ],
+            [
+                "c0e9094cb50d99a7"
             ]
         ]
     },
@@ -866,63 +722,6 @@
         "wires": []
     },
     {
-        "id": "31b930d30898aa25",
-        "type": "link call",
-        "z": "663405f12566bce6",
-        "g": "de0617ba6b2d0a63",
-        "name": "ProcessFile",
-        "links": [
-            "831d3ffb7aab030b"
-        ],
-        "linkType": "static",
-        "timeout": "120",
-        "x": 810,
-        "y": 440,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "42e394c88481172f",
-        "type": "link call",
-        "z": "663405f12566bce6",
-        "g": "87236d5bcabd69a0",
-        "name": "ProcessFile",
-        "links": [
-            "831d3ffb7aab030b"
-        ],
-        "linkType": "static",
-        "timeout": "120",
-        "x": 730,
-        "y": 280,
-        "wires": [
-            [
-                "3347a719b4a044bc"
-            ]
-        ]
-    },
-    {
-        "id": "3faec9f706e79632",
-        "type": "function",
-        "z": "663405f12566bce6",
-        "g": "87236d5bcabd69a0",
-        "name": "Set filename",
-        "func": "msg.filename = \n    env.get(\"FolderToWatch\") \n    + '\\\\' \n    + msg.payload;\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 550,
-        "y": 280,
-        "wires": [
-            [
-                "42e394c88481172f"
-            ]
-        ]
-    },
-    {
         "id": "dad6b43f6743ae15",
         "type": "comment",
         "z": "663405f12566bce6",
@@ -931,28 +730,6 @@
         "info": "This flow processes the file.\n\nIt first renames the file from .dat to .tmp before reading the content \nto make sure the system that is writing the file is not simultaniously \nadding more data to it.",
         "x": 230,
         "y": 540,
-        "wires": []
-    },
-    {
-        "id": "2bd6924622e32179",
-        "type": "comment",
-        "z": "663405f12566bce6",
-        "g": "de0617ba6b2d0a63",
-        "name": "Watch any changes to the folder and trigger the file processing",
-        "info": "",
-        "x": 350,
-        "y": 380,
-        "wires": []
-    },
-    {
-        "id": "d59b117eadf95155",
-        "type": "comment",
-        "z": "663405f12566bce6",
-        "g": "87236d5bcabd69a0",
-        "name": "On startup, check for any newly added files and trigger the processing",
-        "info": "",
-        "x": 370,
-        "y": 120,
         "wires": []
     },
     {
@@ -965,7 +742,8 @@
         "y": 600,
         "wires": [
             [
-                "c2b0fd2a3699ada7"
+                "c2b0fd2a3699ada7",
+                "64405a5328ca5afd"
             ]
         ]
     },
@@ -1067,6 +845,248 @@
         "mode": "return",
         "links": [],
         "x": 715,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "95ed601e9b7582a4",
+        "type": "watch",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "Watch folder changes",
+        "files": "${FolderToWatch}",
+        "recursive": "",
+        "x": 220,
+        "y": 440,
+        "wires": [
+            [
+                "4447b76fbc16edc7"
+            ]
+        ]
+    },
+    {
+        "id": "4447b76fbc16edc7",
+        "type": "switch",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "is update?",
+        "property": "event",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "update",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 450,
+        "y": 440,
+        "wires": [
+            [
+                "61367d0d269217f8"
+            ]
+        ]
+    },
+    {
+        "id": "61367d0d269217f8",
+        "type": "switch",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "is file?",
+        "property": "type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "file",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 630,
+        "y": 440,
+        "wires": [
+            [
+                "31b930d30898aa25"
+            ]
+        ]
+    },
+    {
+        "id": "31b930d30898aa25",
+        "type": "link call",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "ProcessFile",
+        "links": [
+            "831d3ffb7aab030b"
+        ],
+        "linkType": "static",
+        "timeout": "120",
+        "x": 810,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2bd6924622e32179",
+        "type": "comment",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "Watch any changes to the folder and trigger the file processing",
+        "info": "",
+        "x": 350,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "727a7b74b2a235b6",
+        "type": "inject",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "On start",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 180,
+        "wires": [
+            [
+                "ec6410c418d8cbdc"
+            ]
+        ]
+    },
+    {
+        "id": "ec6410c418d8cbdc",
+        "type": "function",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "Read files in folder",
+        "func": "msg.files = fs.readdirSync(env.get(\"FolderToWatch\"));\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "fs",
+                "module": "fs"
+            }
+        ],
+        "x": 410,
+        "y": 180,
+        "wires": [
+            [
+                "3347a719b4a044bc"
+            ]
+        ]
+    },
+    {
+        "id": "3347a719b4a044bc",
+        "type": "loop",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "For each file",
+        "kind": "enum",
+        "count": "",
+        "initial": "1",
+        "step": "1",
+        "condition": "",
+        "conditionType": "js",
+        "when": "before",
+        "enumeration": "files",
+        "enumerationType": "msg",
+        "limit": "",
+        "loopPayload": "loop-val",
+        "finalPayload": "final-orig",
+        "x": 650,
+        "y": 180,
+        "wires": [
+            [],
+            [
+                "3faec9f706e79632"
+            ]
+        ]
+    },
+    {
+        "id": "42e394c88481172f",
+        "type": "link call",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "ProcessFile",
+        "links": [
+            "831d3ffb7aab030b"
+        ],
+        "linkType": "static",
+        "timeout": "120",
+        "x": 730,
+        "y": 280,
+        "wires": [
+            [
+                "3347a719b4a044bc"
+            ]
+        ]
+    },
+    {
+        "id": "3faec9f706e79632",
+        "type": "function",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "Set filename",
+        "func": "msg.filename = \n    env.get(\"FolderToWatch\") \n    + '\\\\' \n    + msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 280,
+        "wires": [
+            [
+                "42e394c88481172f"
+            ]
+        ]
+    },
+    {
+        "id": "d59b117eadf95155",
+        "type": "comment",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "On startup, check for any newly added files and trigger the processing",
+        "info": "",
+        "x": 370,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "c0e9094cb50d99a7",
+        "type": "link out",
+        "z": "663405f12566bce6",
+        "g": "e2df9081b54634df",
+        "name": "ProcessFileOut",
+        "mode": "return",
+        "links": [],
+        "x": 415,
         "y": 660,
         "wires": []
     }
