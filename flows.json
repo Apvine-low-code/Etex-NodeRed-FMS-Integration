@@ -1,1 +1,716 @@
-[]
+[
+    {
+        "id": "663405f12566bce6",
+        "type": "tab",
+        "label": "ProcessFiles",
+        "disabled": false,
+        "info": "",
+        "env": [
+            {
+                "name": "FolderToWatch",
+                "value": "C:\\Users\\haesaph\\OneDrive - Cronos\\Bureaublad\\test",
+                "type": "str"
+            }
+        ]
+    },
+    {
+        "id": "b9112020394e29d0",
+        "type": "subflow",
+        "name": "ProcessFileContent",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 100,
+                "y": 200,
+                "wires": [
+                    {
+                        "id": "ce132316af8a6d68"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 940,
+                "y": 200,
+                "wires": [
+                    {
+                        "id": "979953ca28e71528",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "e2df9081b54634df",
+        "type": "group",
+        "z": "663405f12566bce6",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "831d3ffb7aab030b",
+            "c2b0fd2a3699ada7",
+            "460a4e561498714f",
+            "99d13c2caaf80ea1",
+            "d4986ed2c9343b02",
+            "64405a5328ca5afd",
+            "dad6b43f6743ae15",
+            "723924c63e65e76a"
+        ],
+        "x": 94,
+        "y": 499,
+        "w": 1182,
+        "h": 142
+    },
+    {
+        "id": "de0617ba6b2d0a63",
+        "type": "group",
+        "z": "663405f12566bce6",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "95ed601e9b7582a4",
+            "4447b76fbc16edc7",
+            "61367d0d269217f8",
+            "31b930d30898aa25",
+            "2bd6924622e32179"
+        ],
+        "x": 94,
+        "y": 339,
+        "w": 832,
+        "h": 142
+    },
+    {
+        "id": "87236d5bcabd69a0",
+        "type": "group",
+        "z": "663405f12566bce6",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "727a7b74b2a235b6",
+            "ec6410c418d8cbdc",
+            "3347a719b4a044bc",
+            "42e394c88481172f",
+            "3faec9f706e79632",
+            "d59b117eadf95155"
+        ],
+        "x": 94,
+        "y": 79,
+        "w": 752,
+        "h": 242
+    },
+    {
+        "id": "ce132316af8a6d68",
+        "type": "function",
+        "z": "b9112020394e29d0",
+        "name": "MapMessages",
+        "func": "// File contains multiple lines like this:\n// M4  ,25/09/2024,03:13:18,25/09/2024,03:16:19,***\n// fields are: machine code, start date, start time, end date, end time, reason code\nconst formatDate = global.get(\"formatDate\"); // see 'on-start' tab\nconst lines = msg.payload.split(/\\r?\\n/);\n\nmsg.messages = [];\n\nlines.forEach((line)=>{\n    const fields = line.split(\",\");\n    let startTime = formatDate(fields[1] + fields[2]);\n    let endTime = formatDate(fields[3] + fields[4]);\n\n    msg.messages.push({\n        \"messageType\": \"create_update_downtime\",\n        \"parameters\": [\n            {\n                \"attribute\": \"workcenterid\",\n                \"value\": fields[0].trim()\n            },\n            {\n                \"attribute\": \"startTime\",\n                \"value\": startTime\n            },\n            {\n                \"attribute\": \"endTime\",\n                \"value\": endTime\n            }\n        ]\n    });\n})\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\n\n// input in format dd/MM/yyyyHH:mm:ss\nconst formatDate = function(dateString){\n    const day = dateString.substring(0, 2);\n    const month = dateString.substring(3, 5);\n    const year = dateString.substring(6, 10);\n    const hour = dateString.substring(10, 12);\n    const minutes = dateString.substring(13, 15);\n    const seconds = dateString.substring(16, 18);\n\n    // We don't convert through a data object because we don't want any\n    // timezone to be added. This node-red instance will process files from\n    // different locations around the world. We need to send the date to Mendix\n    // in the local time zone where the downtime occured (as written in the txt file)\n\n    // output in format yyyy-MM-ddTHH:mm:ss\n    return year + '-' + month + '-' + day + 'T' + hour + ':' + minutes + ':' + seconds;\n}\n\nglobal.set(\"formatDate\", formatDate);",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 200,
+        "wires": [
+            [
+                "dc85cf02c3bc40cb",
+                "979953ca28e71528"
+            ]
+        ]
+    },
+    {
+        "id": "dc85cf02c3bc40cb",
+        "type": "debug",
+        "z": "b9112020394e29d0",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "messages",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "979953ca28e71528",
+        "type": "loop",
+        "z": "b9112020394e29d0",
+        "name": "",
+        "kind": "enum",
+        "count": "",
+        "initial": "1",
+        "step": "1",
+        "condition": "",
+        "conditionType": "js",
+        "when": "before",
+        "enumeration": "messages",
+        "enumerationType": "msg",
+        "limit": "",
+        "loopPayload": "loop-val",
+        "finalPayload": "final-count",
+        "x": 590,
+        "y": 200,
+        "wires": [
+            [],
+            [
+                "e0cb229e44e3c66f"
+            ]
+        ]
+    },
+    {
+        "id": "e0cb229e44e3c66f",
+        "type": "function",
+        "z": "b9112020394e29d0",
+        "name": "function 1",
+        "func": "let iotMessage = \nBuffer.from(JSON.stringify(msg.payload)).toString('base64');\n\nmsg.payload = {\n\t\"id\": \"859d19e9-6fb2-a915-4466-3c84f94b12d7\",\n\t\"source\": \"/SUBSCRIPTIONS/3F7D5CC5-D591-43C5-9D67-D2725DD0196D/RESOURCEGROUPS/WE-HUB-OT-FRVSL01-T-RG/PROVIDERS/MICROSOFT.DEVICES/IOTHUBS/WE-HUB-FRVSL01-T-IOT\",\n\t\"specversion\": \"1.0\",\n\t\"type\": \"Microsoft.Devices.DeviceTelemetry\",\n\t\"subject\": \"devices/FRVLS1-IOTEDGE201T/TelemetryCollectionModule\",\n\t\"time\": \"2022-10-20T11:04:09.614Z\",\n\t\"data\": {\n\t\t\"properties\": {},\n\t\t\"systemProperties\": {\n\t\t\t\"iothub-connection-device-id\": \"FRVLS1-IOTEDGE201T\",\n\t\t\t\"iothub-connection-module-id\": \"TelemetryCollectionModule\",\n\t\t\t\"iothub-connection-auth-method\": \"{\\\"scope\\\":\\\"module\\\",\\\"type\\\":\\\"sas\\\",\\\"issuer\\\":\\\"iothub\\\",\\\"acceptingIpFilterRule\\\":null}\",\n\t\t\t\"iothub-connection-auth-generation-id\": \"638007332889069917\",\n\t\t\t\"iothub-enqueuedtime\": \"2022-10-20T11:04:09.6140000Z\",\n\t\t\t\"iothub-message-source\": \"Telemetry\"\n\t\t},\n\t\t\"body\": iotMessage\n\t}\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 320,
+        "wires": [
+            [
+                "1c0af6548ee20abc"
+            ]
+        ]
+    },
+    {
+        "id": "1c0af6548ee20abc",
+        "type": "http request",
+        "z": "b9112020394e29d0",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:8080/rest/shopfloordata/v1/azuremessage",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "x-api-key",
+                "valueType": "other",
+                "valueValue": "TestTest123"
+            }
+        ],
+        "x": 670,
+        "y": 320,
+        "wires": [
+            [
+                "979953ca28e71528"
+            ]
+        ]
+    },
+    {
+        "id": "95ed601e9b7582a4",
+        "type": "watch",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "Watch folder changes",
+        "files": "${FolderToWatch}",
+        "recursive": "",
+        "x": 220,
+        "y": 440,
+        "wires": [
+            [
+                "4447b76fbc16edc7"
+            ]
+        ]
+    },
+    {
+        "id": "4447b76fbc16edc7",
+        "type": "switch",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "is update?",
+        "property": "event",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "update",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 450,
+        "y": 440,
+        "wires": [
+            [
+                "61367d0d269217f8"
+            ]
+        ]
+    },
+    {
+        "id": "61367d0d269217f8",
+        "type": "switch",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "is file?",
+        "property": "type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "file",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 630,
+        "y": 440,
+        "wires": [
+            [
+                "31b930d30898aa25"
+            ]
+        ]
+    },
+    {
+        "id": "727a7b74b2a235b6",
+        "type": "inject",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "On start",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 180,
+        "wires": [
+            [
+                "ec6410c418d8cbdc"
+            ]
+        ]
+    },
+    {
+        "id": "ec6410c418d8cbdc",
+        "type": "function",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "Read files in folder",
+        "func": "msg.files = fs.readdirSync(env.get(\"FolderToWatch\"));\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "fs",
+                "module": "fs"
+            }
+        ],
+        "x": 410,
+        "y": 180,
+        "wires": [
+            [
+                "3347a719b4a044bc"
+            ]
+        ]
+    },
+    {
+        "id": "3347a719b4a044bc",
+        "type": "loop",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "For each file",
+        "kind": "enum",
+        "count": "",
+        "initial": "1",
+        "step": "1",
+        "condition": "",
+        "conditionType": "js",
+        "when": "before",
+        "enumeration": "files",
+        "enumerationType": "msg",
+        "limit": "",
+        "loopPayload": "loop-val",
+        "finalPayload": "final-orig",
+        "x": 650,
+        "y": 180,
+        "wires": [
+            [],
+            [
+                "3faec9f706e79632"
+            ]
+        ]
+    },
+    {
+        "id": "831d3ffb7aab030b",
+        "type": "link in",
+        "z": "663405f12566bce6",
+        "g": "e2df9081b54634df",
+        "name": "ProcessTxtFile",
+        "links": [],
+        "x": 135,
+        "y": 600,
+        "wires": [
+            [
+                "99d13c2caaf80ea1"
+            ]
+        ]
+    },
+    {
+        "id": "c2b0fd2a3699ada7",
+        "type": "file",
+        "z": "663405f12566bce6",
+        "g": "e2df9081b54634df",
+        "name": "delete file",
+        "filename": "newFileName",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "delete",
+        "encoding": "none",
+        "x": 1120,
+        "y": 600,
+        "wires": [
+            [
+                "64405a5328ca5afd"
+            ]
+        ]
+    },
+    {
+        "id": "460a4e561498714f",
+        "type": "function",
+        "z": "663405f12566bce6",
+        "g": "e2df9081b54634df",
+        "name": "rename .txt to .tmp",
+        "func": "msg.newFileName = msg.filename.replaceAll('.txt', '.tmp');\n\nfs.renameSync(msg.filename, msg.newFileName);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "fs",
+                "module": "fs"
+            }
+        ],
+        "x": 470,
+        "y": 600,
+        "wires": [
+            [
+                "d4986ed2c9343b02"
+            ]
+        ]
+    },
+    {
+        "id": "99d13c2caaf80ea1",
+        "type": "switch",
+        "z": "663405f12566bce6",
+        "g": "e2df9081b54634df",
+        "name": "is .txt file?",
+        "property": "filename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": ".txt",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 260,
+        "y": 600,
+        "wires": [
+            [
+                "460a4e561498714f"
+            ]
+        ]
+    },
+    {
+        "id": "d4986ed2c9343b02",
+        "type": "file in",
+        "z": "663405f12566bce6",
+        "g": "e2df9081b54634df",
+        "name": "",
+        "filename": "newFileName",
+        "filenameType": "msg",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 700,
+        "y": 600,
+        "wires": [
+            [
+                "723924c63e65e76a"
+            ]
+        ]
+    },
+    {
+        "id": "64405a5328ca5afd",
+        "type": "link out",
+        "z": "663405f12566bce6",
+        "g": "e2df9081b54634df",
+        "name": "ProcessTxtFileOut",
+        "mode": "return",
+        "links": [],
+        "x": 1235,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "31b930d30898aa25",
+        "type": "link call",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "ProcessTxtFile",
+        "links": [
+            "831d3ffb7aab030b"
+        ],
+        "linkType": "static",
+        "timeout": "120",
+        "x": 820,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "42e394c88481172f",
+        "type": "link call",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "ProcessTxtFile",
+        "links": [
+            "831d3ffb7aab030b"
+        ],
+        "linkType": "static",
+        "timeout": "120",
+        "x": 740,
+        "y": 280,
+        "wires": [
+            [
+                "3347a719b4a044bc"
+            ]
+        ]
+    },
+    {
+        "id": "3faec9f706e79632",
+        "type": "function",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "Set filename",
+        "func": "msg.filename = \n    env.get(\"FolderToWatch\") \n    + '\\\\' \n    + msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 280,
+        "wires": [
+            [
+                "42e394c88481172f"
+            ]
+        ]
+    },
+    {
+        "id": "dad6b43f6743ae15",
+        "type": "comment",
+        "z": "663405f12566bce6",
+        "g": "e2df9081b54634df",
+        "name": "File processing: README",
+        "info": "This flow processes the file.\n\nIt first renames the file from .txt to .tmp before reading the content \nto make sure the system that is writing the file is not simultaniously \nadding more data to it.",
+        "x": 230,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "2bd6924622e32179",
+        "type": "comment",
+        "z": "663405f12566bce6",
+        "g": "de0617ba6b2d0a63",
+        "name": "Watch any changes to the folder and trigger the file processing",
+        "info": "",
+        "x": 350,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "d59b117eadf95155",
+        "type": "comment",
+        "z": "663405f12566bce6",
+        "g": "87236d5bcabd69a0",
+        "name": "On startup, check for any newly added files and trigger the processing",
+        "info": "",
+        "x": 370,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "723924c63e65e76a",
+        "type": "subflow:b9112020394e29d0",
+        "z": "663405f12566bce6",
+        "g": "e2df9081b54634df",
+        "name": "",
+        "x": 910,
+        "y": 600,
+        "wires": [
+            [
+                "c2b0fd2a3699ada7"
+            ]
+        ]
+    },
+    {
+        "id": "1f2e365d18da426e",
+        "type": "inject",
+        "z": "663405f12566bce6",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 860,
+        "wires": [
+            [
+                "30e47b7aa1b25893"
+            ]
+        ]
+    },
+    {
+        "id": "675e90e6d281b120",
+        "type": "http request",
+        "z": "663405f12566bce6",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:8080/rest/shopfloordata/v1/azuremessage",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "x-api-key",
+                "valueType": "other",
+                "valueValue": "TestTest123"
+            }
+        ],
+        "x": 770,
+        "y": 860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e177bc6786cda8e3",
+        "type": "function",
+        "z": "663405f12566bce6",
+        "name": "function 2",
+        "func": "let iotMessage = \nBuffer.from(JSON.stringify(msg.payload)).toString('base64');\n\nmsg.payload = {\n\t\"id\": \"859d19e9-6fb2-a915-4466-3c84f94b12d7\",\n\t\"source\": \"/SUBSCRIPTIONS/3F7D5CC5-D591-43C5-9D67-D2725DD0196D/RESOURCEGROUPS/WE-HUB-OT-FRVSL01-T-RG/PROVIDERS/MICROSOFT.DEVICES/IOTHUBS/WE-HUB-FRVSL01-T-IOT\",\n\t\"specversion\": \"1.0\",\n\t\"type\": \"Microsoft.Devices.DeviceTelemetry\",\n\t\"subject\": \"devices/FRVLS1-IOTEDGE201T/TelemetryCollectionModule\",\n\t\"time\": \"2022-10-20T11:04:09.614Z\",\n\t\"data\": {\n\t\t\"properties\": {},\n\t\t\"systemProperties\": {\n\t\t\t\"iothub-connection-device-id\": \"FRVLS1-IOTEDGE201T\",\n\t\t\t\"iothub-connection-module-id\": \"TelemetryCollectionModule\",\n\t\t\t\"iothub-connection-auth-method\": \"{\\\"scope\\\":\\\"module\\\",\\\"type\\\":\\\"sas\\\",\\\"issuer\\\":\\\"iothub\\\",\\\"acceptingIpFilterRule\\\":null}\",\n\t\t\t\"iothub-connection-auth-generation-id\": \"638007332889069917\",\n\t\t\t\"iothub-enqueuedtime\": \"2022-10-20T11:04:09.6140000Z\",\n\t\t\t\"iothub-message-source\": \"Telemetry\"\n\t\t},\n\t\t\"body\": iotMessage\n\t}\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 860,
+        "wires": [
+            [
+                "675e90e6d281b120"
+            ]
+        ]
+    },
+    {
+        "id": "30e47b7aa1b25893",
+        "type": "function",
+        "z": "663405f12566bce6",
+        "name": "function 3",
+        "func": "msg.payload = {\n        \"messageType\": \"scrapcounter_update\",\n        \"parameters\": [\n            {\n                \"attribute\": \"workcenterid\",\n                \"value\": \"70013130\"\n            }         \n        ],\n        \"tagValues\": [\n            {\n            \"nodeId\": \"ns=2;s=Channel1.Device1.Tag1\",\n            \"alias\" : \"productionorder\",\n            \"value\": \"104015202\",\n            \"dataType\": \"5\",\n            \"localTimestamp\": \"2023-10-24T08:45:11.575+02:00\",\n            \"UTCTimestamp\": \"2023-10-24T06:45:11.575Z\",\n            \"quality\": \"good\"\n            },\n                        {\n            \"nodeId\": \"ns=2;s=Channel1.Device1.Tag1\",\n            \"alias\" : \"eventtype\",\n            \"value\": \"2\",\n            \"dataType\": \"5\",\n            \"localTimestamp\": \"2023-10-24T08:45:11.575+02:00\",\n            \"UTCTimestamp\": \"2023-10-24T06:45:11.575Z\",\n            \"quality\": \"good\"\n            },\n                        {\n            \"nodeId\": \"ns=2;s=Channel1.Device1.Tag1\",\n            \"alias\" : \"scrapReason\",\n            \"value\": \"test\",\n            \"dataType\": \"5\",\n            \"localTimestamp\": \"2023-10-24T08:45:11.575+02:00\",\n            \"UTCTimestamp\": \"2023-10-24T06:45:11.575Z\",\n            \"quality\": \"good\"\n            }\n        ]\n    }\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 860,
+        "wires": [
+            [
+                "e177bc6786cda8e3"
+            ]
+        ]
+    }
+]
