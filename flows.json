@@ -32,11 +32,44 @@
         ],
         "out": [
             {
-                "x": 940,
+                "x": 880,
                 "y": 200,
                 "wires": [
                     {
-                        "id": "979953ca28e71528",
+                        "id": "8a3c5fc546c5fe84",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "5a098ffd973c7269",
+        "type": "subflow",
+        "name": "SendMessage",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 160,
+                "y": 280,
+                "wires": [
+                    {
+                        "id": "4cfe62c98222f2ec"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 560,
+                "y": 280,
+                "wires": [
+                    {
+                        "id": "5a098ffd973c7269",
                         "port": 0
                     }
                 ]
@@ -131,6 +164,52 @@
         "h": 242
     },
     {
+        "id": "f418b45e46968f29",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "",
+        "verifyservercert": false,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "71a232d8dcd5696c",
+        "type": "mqtt-broker",
+        "name": "IoTHub",
+        "broker": "ssl://WE-HUB-P-IOT.azure-devices.net",
+        "port": "443",
+        "tls": "f418b45e46968f29",
+        "clientid": "ESELP1-IOTEDGE02PTEST",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
         "id": "ce132316af8a6d68",
         "type": "function",
         "z": "b9112020394e29d0",
@@ -139,34 +218,16 @@
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
-        "initialize": "// Code added here will be run once\n// whenever the node is started.\n\n// input in format dd/MM/yyyyHH:mm:ss\nconst formatDate = function(dateString){\n    node.warn(dateString)\n    const day = dateString.substring(0, 2);\n    const month = dateString.substring(3, 5);\n    const year = dateString.substring(6, 10);\n    const hour = dateString.substring(10, 12);\n    const minutes = dateString.substring(13, 15);\n    const seconds = dateString.substring(16, 18);\n\n    // We don't convert through a data object because we don't want any\n    // timezone to be added. This node-red instance will process files from\n    // different locations around the world. We need to send the date to Mendix\n    // in the local time zone where the downtime occured (as written in the txt file)\n\n    // output in format yyyy-MM-ddTHH:mm:ss\n    return year + '-' + month + '-' + day + 'T' + hour + ':' + minutes + ':' + seconds;\n}\n\nglobal.set(\"formatDate\", formatDate);",
+        "initialize": "// Code added here will be run once\n// whenever the node is started.\n\n// input in format dd/MM/yyyyHH:mm:ss\nconst formatDate = function(dateString){\n    const day = dateString.substring(0, 2);\n    const month = dateString.substring(3, 5);\n    const year = dateString.substring(6, 10);\n    const hour = dateString.substring(10, 12);\n    const minutes = dateString.substring(13, 15);\n    const seconds = dateString.substring(16, 18);\n\n    // We don't convert through a data object because we don't want any\n    // timezone to be added. This node-red instance will process files from\n    // different locations around the world. We need to send the date to Mendix\n    // in the local time zone where the downtime occured (as written in the txt file)\n\n    // output in format yyyy-MM-ddTHH:mm:ss\n    return year + '-' + month + '-' + day + 'T' + hour + ':' + minutes + ':' + seconds;\n}\n\nglobal.set(\"formatDate\", formatDate);",
         "finalize": "",
         "libs": [],
         "x": 280,
         "y": 200,
         "wires": [
             [
-                "dc85cf02c3bc40cb",
-                "979953ca28e71528"
+                "8a3c5fc546c5fe84"
             ]
         ]
-    },
-    {
-        "id": "dc85cf02c3bc40cb",
-        "type": "debug",
-        "z": "b9112020394e29d0",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "messages",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 400,
-        "y": 400,
-        "wires": []
     },
     {
         "id": "979953ca28e71528",
@@ -185,8 +246,8 @@
         "limit": "",
         "loopPayload": "loop-val",
         "finalPayload": "final-count",
-        "x": 690,
-        "y": 320,
+        "x": 270,
+        "y": 600,
         "wires": [
             [],
             [
@@ -206,8 +267,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 580,
-        "y": 440,
+        "x": 160,
+        "y": 720,
         "wires": [
             [
                 "1c0af6548ee20abc"
@@ -237,11 +298,299 @@
                 "valueValue": "TestTest123"
             }
         ],
-        "x": 770,
-        "y": 440,
+        "x": 350,
+        "y": 720,
         "wires": [
             [
                 "979953ca28e71528"
+            ]
+        ]
+    },
+    {
+        "id": "8a3c5fc546c5fe84",
+        "type": "loop",
+        "z": "b9112020394e29d0",
+        "name": "",
+        "kind": "enum",
+        "count": "",
+        "initial": "1",
+        "step": "1",
+        "condition": "",
+        "conditionType": "js",
+        "when": "before",
+        "enumeration": "messages",
+        "enumerationType": "msg",
+        "limit": "",
+        "loopPayload": "loop-val",
+        "finalPayload": "final-count",
+        "x": 530,
+        "y": 200,
+        "wires": [
+            [],
+            [
+                "5c2a44289ea51b7e"
+            ]
+        ]
+    },
+    {
+        "id": "5c2a44289ea51b7e",
+        "type": "change",
+        "z": "b9112020394e29d0",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "message",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 300,
+        "wires": [
+            [
+                "717b295dc23fb14a"
+            ]
+        ]
+    },
+    {
+        "id": "717b295dc23fb14a",
+        "type": "subflow:5a098ffd973c7269",
+        "z": "b9112020394e29d0",
+        "name": "",
+        "x": 660,
+        "y": 300,
+        "wires": [
+            [
+                "8a3c5fc546c5fe84"
+            ]
+        ]
+    },
+    {
+        "id": "348735635f2198a1",
+        "type": "comment",
+        "z": "b9112020394e29d0",
+        "name": "local test to send to mendix directly",
+        "info": "",
+        "x": 240,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "899a24a304ea40ce",
+        "type": "debug",
+        "z": "5a098ffd973c7269",
+        "name": "LogValue",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "4cfe62c98222f2ec",
+        "type": "change",
+        "z": "5a098ffd973c7269",
+        "name": "Set payload",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "message",
+                "tot": "msg",
+                "dc": true
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 310,
+        "y": 340,
+        "wires": [
+            [
+                "899a24a304ea40ce",
+                "1d25a282a8bb3877"
+            ]
+        ]
+    },
+    {
+        "id": "a477f0da13e3d992",
+        "type": "mqtt out",
+        "z": "5a098ffd973c7269",
+        "name": "",
+        "topic": "devices/ESELP1-IOTEDGE02P/messages/events/",
+        "qos": "1",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "71a232d8dcd5696c",
+        "x": 1030,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "1d25a282a8bb3877",
+        "type": "q-gate",
+        "z": "5a098ffd973c7269",
+        "name": "",
+        "controlTopic": "control",
+        "defaultState": "open",
+        "openCmd": "open",
+        "closeCmd": "close",
+        "toggleCmd": "toggle",
+        "queueCmd": "queue",
+        "defaultCmd": "default",
+        "triggerCmd": "trigger",
+        "flushCmd": "flush",
+        "resetCmd": "reset",
+        "peekCmd": "peek",
+        "dropCmd": "drop",
+        "statusCmd": "status",
+        "maxQueueLength": "0",
+        "keepNewest": false,
+        "qToggle": false,
+        "persist": true,
+        "storeName": "default",
+        "x": 690,
+        "y": 500,
+        "wires": [
+            [
+                "a477f0da13e3d992"
+            ]
+        ]
+    },
+    {
+        "id": "e097997bbf128185",
+        "type": "change",
+        "z": "5a098ffd973c7269",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "control",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "open",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 500,
+        "wires": [
+            [
+                "1d25a282a8bb3877"
+            ]
+        ]
+    },
+    {
+        "id": "329773ef7697f870",
+        "type": "status",
+        "z": "5a098ffd973c7269",
+        "name": "",
+        "scope": [
+            "a477f0da13e3d992"
+        ],
+        "x": 160,
+        "y": 520,
+        "wires": [
+            [
+                "8ed466bc9c0249f3"
+            ]
+        ]
+    },
+    {
+        "id": "8ed466bc9c0249f3",
+        "type": "switch",
+        "z": "5a098ffd973c7269",
+        "name": "",
+        "property": "status.text",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "node-red:common.status.connected",
+                "vt": "str"
+            },
+            {
+                "t": "neq",
+                "v": "node-red:common.status.connected",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 310,
+        "y": 520,
+        "wires": [
+            [
+                "e097997bbf128185"
+            ],
+            [
+                "bc088282b872c15f"
+            ]
+        ]
+    },
+    {
+        "id": "bc088282b872c15f",
+        "type": "change",
+        "z": "5a098ffd973c7269",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "control",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "queue",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 540,
+        "wires": [
+            [
+                "1d25a282a8bb3877"
             ]
         ]
     },
