@@ -739,8 +739,8 @@
         "z": "663405f12566bce6",
         "g": "e2df9081b54634df",
         "name": "message type",
-        "property": "filename",
-        "propertyType": "msg",
+        "property": "$lowercase(msg.filename)",
+        "propertyType": "jsonata",
         "rules": [
             {
                 "t": "cont",
@@ -796,8 +796,8 @@
         "z": "663405f12566bce6",
         "g": "e2df9081b54634df",
         "name": "relevant message type?",
-        "property": "filename",
-        "propertyType": "msg",
+        "property": "$lowercase(msg.filename)",
+        "propertyType": "jsonata",
         "rules": [
             {
                 "t": "cont",
